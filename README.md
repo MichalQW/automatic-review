@@ -1,3 +1,5 @@
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FMichalQW%2Fautomatic-review.git)
+
 ## Stwórz Aplikację Quizową w React
 
 Twoim zadaniem jest stworzenie interaktywnej aplikacji quizowej, która testuje wiedzę użytkownika z wybranego zakresu tematycznego. Aplikacja powinna składać się z ekranu startowego, serii pytań z wielokrotnym wyborem oraz podsumowania wyników na końcu quizu. Dodatkowo, użytkownik powinien mieć możliwość rozpoczęcia quizu od nowa.
