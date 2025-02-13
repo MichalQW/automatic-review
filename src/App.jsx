@@ -15,7 +15,7 @@ function App() {
     <>
       {quizStarted === false ? (
         <StartScreen>
-          <button className="btn" onClick={startQuiz}>
+          <button data-testid="start-button" className="btn" onClick={startQuiz}>
             Rozpocznij quiz
           </button>
         </StartScreen>
