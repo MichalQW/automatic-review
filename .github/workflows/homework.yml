@@ -1,0 +1,50 @@
+name: Homework Validation and Cypress Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-tests-hash-and-execute:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute tests file hash
+        id: check
+        run: |
+          HASH=$(shasum -a 256 cypress/e2e/spec.cy.js | awk '{ print $1 }')
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      - name: Verify tests integrity
+        run: |
+          if [[ "${{ steps.check.outputs.hash }}" != "254c13ac5922515ce4e46e4a36289f078c8cf1a5af219c5e954c36f953a46f46" ]]; then
+            echo "🚫 TEST FILE HAS BEEN MODIFIED. HASH CHECK FAILED!"
+            exit 1
+          else
+            echo "✅ Test file integrity verified."
+          fi
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Cypress Tests
+        run: |
+          npm run build
+          npx cypress run
+
+      - name: Send test results (example via HTTP POST)
+        if: always()
+        run: |
+          curl -X POST https://cae5-195-191-162-78.ngrok-free.app/api/results \
+            -H "Content-Type: application/json" \
+            -d '{
+              "studentRepository": "${{ github.repository }}",
+              "commitSha": "${{ github.sha }}",
+              "testResult": "${{ job.status }}"
+            }'
