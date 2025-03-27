@@ -36,15 +36,22 @@ jobs:
       - name: Run Cypress Tests
         run: |
           npm run build
-          npx cypress run
-
-      - name: Send test results (example via HTTP POST)
+          npm run cy:run
+      - name: Merge Mochawesome JSON Results
         if: always()
         run: |
+          npx mochawesome-merge cypress/results/*.json > cypress/results/output.json
+
+      - name: Send detailed test results
+        if: always()
+        run: |
+          TEST_RESULTS=$(cat cypress/results/output.json | jq '.')
           curl -X POST https://cae5-195-191-162-78.ngrok-free.app/api/results \
             -H "Content-Type: application/json" \
-            -d '{
-              "studentRepository": "${{ github.repository }}",
-              "commitSha": "${{ github.sha }}",
-              "testResult": "${{ job.status }}"
-            }'
+            -d @- <<EOF
+          {
+            "studentRepository": "${{ github.repository }}",
+            "commitSha": "${{ github.sha }}",
+            "testResult": $TEST_RESULTS
+          }
+          EOF
