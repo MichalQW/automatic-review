@@ -11,6 +11,9 @@ on:
 jobs:
   validate-tests-hash-and-execute:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write            # pozwala uzyskać token OIDC od GitHub Actions
+      contents: read             # niezbędne do checkoutu kodu
 
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +26,8 @@ jobs:
 
       - name: Verify tests integrity
         run: |
-          if [[ "${{ steps.check.outputs.hash }}" != "58f563f0a870daf29d28aaac5d2eb5cf5eef04093d70bb3853958deeaa465ba9" ]]; then
+          EXPECTED_HASH="58f563f0a870daf29d28aaac5d2eb5cf5eef04093d70bb3853958deeaa465ba9"
+          if [[ "${{ steps.check.outputs.hash }}" != "$EXPECTED_HASH" ]]; then
             echo "🚫 TEST FILE HAS BEEN MODIFIED. HASH CHECK FAILED!"
             exit 1
           else
@@ -37,17 +41,26 @@ jobs:
         run: |
           npm run build
           npm run cy:run
+
       - name: Merge Mochawesome JSON Results
         if: always()
         run: |
           npx mochawesome-merge cypress/results/*.json > cypress/results/output.json
 
-      - name: Send detailed test results
+      - name: Obtain OIDC Token and Send detailed test results
         if: always()
+        env:
+          ACTIONS_ID_TOKEN_REQUEST_URL: ${{ env.ACTIONS_ID_TOKEN_REQUEST_URL }}
+          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
         run: |
+          ID_TOKEN=$(curl -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+          "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=homework-test-server" | jq -r '.value')
+
           TEST_RESULTS=$(cat cypress/results/output.json | jq '.')
+
           curl -X POST https://cae5-195-191-162-78.ngrok-free.app/api/results \
             -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $ID_TOKEN" \
             -d @- <<EOF
           {
             "studentRepository": "${{ github.repository }}",
