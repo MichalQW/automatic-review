@@ -23,7 +23,7 @@ jobs:
 
       - name: Verify tests integrity
         run: |
-          if [[ "${{ steps.check.outputs.hash }}" != "254c13ac5922515ce4e46e4a36289f078c8cf1a5af219c5e954c36f953a46f46" ]]; then
+          if [[ "${{ steps.check.outputs.hash }}" != "58f563f0a870daf29d28aaac5d2eb5cf5eef04093d70bb3853958deeaa465ba9" ]]; then
             echo "🚫 TEST FILE HAS BEEN MODIFIED. HASH CHECK FAILED!"
             exit 1
           else
