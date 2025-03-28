@@ -12,8 +12,8 @@ jobs:
   validate-tests-hash-and-execute:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write            # pozwala uzyskać token OIDC od GitHub Actions
-      contents: read             # niezbędne do checkoutu kodu
+      id-token: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +58,7 @@ jobs:
 
           TEST_RESULTS=$(cat cypress/results/output.json | jq '.')
 
-          curl -X POST https://cae5-195-191-162-78.ngrok-free.app/api/results \
+          curl -X POST https://express-server-test-nz06tj0vu-michalqws-projects.vercel.app/api/results \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $ID_TOKEN" \
             -d @- <<EOF
