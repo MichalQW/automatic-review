@@ -58,7 +58,7 @@ jobs:
 
           TEST_RESULTS=$(cat cypress/results/output.json | jq '.')
 
-          curl -X POST https://express-server-test-nz06tj0vu-michalqws-projects.vercel.app/api/results \
+          curl -X POST https://express-server-test-hazel.vercel.app/api/results \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $ID_TOKEN" \
             -d @- <<EOF
